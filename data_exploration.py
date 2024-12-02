@@ -2,7 +2,10 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from data_loader import load_data
+
+def load_data():
+    gtdb_df = pd.read_csv('globalterrorismdb.csv', encoding='ISO-8859-1', low_memory=False)
+    return gtdb_df
 
 def column_dropper(df, threshold):
     """
@@ -45,15 +48,18 @@ with open('output.txt', 'w') as f:
     # Select numerical columns
     numerical_columns = df_cleaned.select_dtypes(include='number').columns
 
-    # Create individual box plots for each numerical column of data
-    fig, axes = plt.subplots(nrows=int(np.ceil(len(numerical_columns) / 4)), ncols=4, figsize=(12, 8))
+    # Create individual histograms for each numerical column of data
+    fig, axes = plt.subplots(nrows=int(np.ceil(len(numerical_columns) / 4)), ncols=4, figsize=(20, 30))
 
     for i, column in enumerate(numerical_columns):
         row, col = i // 4, i % 4
-        axes[row, col].boxplot(df_cleaned[column])
+        axes[row, col].hist(df_cleaned[column])  # Histograms
         axes[row, col].set_title(column)
+        axes[row, col].set_xlabel(column)  # Add x-axis label for clarity
+        axes[row, col].set_ylabel('Frequency')  # Add y-axis label
 
-    plt.tight_layout()
+    # Adjust spacing between subplots
+    plt.subplots_adjust(hspace=0.8, wspace=0.5)  # Increase vertical and horizontal spacing
 
     # Save the plot to a file (replace 'my_plot.png' with desired filename)
     plt.savefig('my_plot.png')
