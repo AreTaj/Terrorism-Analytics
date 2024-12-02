@@ -16,8 +16,8 @@ def column_dropper(df, threshold):
     The DataFrame with the columns dropped.
     """
 
-    missing_values_percent = df.isnull().sum() * 100 / len(df)
-    columns_to_drop = missing_values_percent[missing_values_percent > threshold].index
+    missing_values_per_column = df.isnull().sum() / len(df)
+    columns_to_drop = missing_values_per_column[missing_values_per_column > threshold].index
 
     print(f"Dropping columns with more than {threshold * 100}% missing values:")
     for col in columns_to_drop:
