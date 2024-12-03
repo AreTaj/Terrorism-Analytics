@@ -14,6 +14,7 @@ def clean_data(df, threshold):
     Args:
     df: The DataFrame to process.
     threshold: The maximum allowed percentage of missing values (0-1).
+        * Generally speaking, anything that is more than 90% blank is probably not useful for this analysis
 
     Returns:
     The DataFrame with the columns dropped.
@@ -26,17 +27,29 @@ def clean_data(df, threshold):
     for col in columns_to_drop:
         print(f"- {col}")
 
-    cleaned_df = df.drop(columns_to_drop, axis=1)
+    df_dropped = df.drop(columns_to_drop, axis=1)
+
+    """ 
+    Drop any rows with blank values in nkill (number killed).
+    Note that this does NOT drop rows with nkill = 0.
+    """
+    cleaned_df=df_dropped.dropna(subset=['nkill'])
+
+    # Return a final cleaned dataframe
     return cleaned_df
 
+""" Section: Load and Clean Data """
+# Load original dataframe provided by globalterrorismdb.csv
+gtdb_df = load_data()
+
+# Clean data using function clean_data()
+df_cleaned = clean_data(gtdb_df, 0.9)  # Drop columns with >90% missing values
+
+""" Section: Data Exploration """
+# Output all print statements to a file 'exploratory_output.txt'
 with open('exploratory_output.txt', 'w') as f:
     original_stdout = sys.stdout
     sys.stdout = f
-
-    # Load original dataframe
-    gtdb_df = load_data()
-
-    df_cleaned = clean_data(gtdb_df, 0.9)  # Drop columns with >90% missing values
 
     # Print first five rows of df_cleaned
     print(df_cleaned.head(5), file=f)
@@ -44,7 +57,7 @@ with open('exploratory_output.txt', 'w') as f:
     # Print dataframe shape
     print(df_cleaned.shape, file=f)
 
-    """ Section: Explore Data """
+    """ Subsection: Multiple Numerical Histograms """
 
     # Select numerical columns
     numerical_columns = df_cleaned.select_dtypes(include='number').columns
@@ -65,5 +78,28 @@ with open('exploratory_output.txt', 'w') as f:
     # Save the plot to a file (replace 'my_plot.png' with desired filename)
     plt.savefig('histograms.png')
     print(f"Plot saved to: histograms.png\n", file=f)
+
+    """ Subsection: Examine nkill (death tolls) """
+    print(df_cleaned['nkill'].describe())
+
+    import seaborn as sns
+    # Box plot
+    plt.figure(figsize=(8, 6))
+    sns.boxplot(x=df_cleaned['nkill'])
+    plt.title('Box Plot of Death Tolls')
+    plt.xlabel('Deaths per Incident')
+    plt.savefig('death_toll_boxplot.png')
+    print(f"Plot saved to: death_toll_boxplot.png\n", file=f)
+
+"""     import seaborn as sns
+    # Visualize the distribution of obesity levels
+    plt.figure(figsize=(18,6))
+    sns.histplot(data=df_cleaned, x='nkill', kde=True, log_scale=True)
+    plt.title('Distribution of Death Tolls')
+    plt.xlabel('Deaths per Incident')
+    plt.ylabel('Frequency')
+    # Save the plot to a file (replace 'my_plot.png' with desired filename)
+    plt.savefig('death_toll_histogram.png')
+    print(f"Plot saved to: death_toll_histogram.png\n", file=f) """
 
 sys.stdout = original_stdout

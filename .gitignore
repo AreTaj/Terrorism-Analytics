@@ -1,5 +1,7 @@
 # Ignore the following files
 globalterrorismdb.csv
-histograms.png
 exploratory_output.txt
 __pycache__
+
+# Ignote the following file types
+*.png
