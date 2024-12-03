@@ -7,7 +7,7 @@ def load_data():
     gtdb_df = pd.read_csv('globalterrorismdb.csv', encoding='ISO-8859-1', low_memory=False)
     return gtdb_df
 
-def column_dropper(df, threshold):
+def clean_data(df, threshold):
     """
     Drops columns from a DataFrame that have more than the specified threshold of missing values.
 
@@ -26,16 +26,17 @@ def column_dropper(df, threshold):
     for col in columns_to_drop:
         print(f"- {col}")
 
-    return df.drop(columns_to_drop, axis=1)
+    cleaned_df = df.drop(columns_to_drop, axis=1)
+    return cleaned_df
 
-with open('output.txt', 'w') as f:
+with open('exploratory_output.txt', 'w') as f:
     original_stdout = sys.stdout
     sys.stdout = f
 
-    # Load original dataframe created in data_loader.py
+    # Load original dataframe
     gtdb_df = load_data()
 
-    df_cleaned = column_dropper(gtdb_df, 0.9)  # Drop columns with >90% missing values
+    df_cleaned = clean_data(gtdb_df, 0.9)  # Drop columns with >90% missing values
 
     # Print first five rows of df_cleaned
     print(df_cleaned.head(5), file=f)
@@ -62,7 +63,7 @@ with open('output.txt', 'w') as f:
     plt.subplots_adjust(hspace=0.8, wspace=0.5)  # Increase vertical and horizontal spacing
 
     # Save the plot to a file (replace 'my_plot.png' with desired filename)
-    plt.savefig('my_plot.png')
-    print(f"Plot saved to: my_plot.png\n", file=f)
+    plt.savefig('histograms.png')
+    print(f"Plot saved to: histograms.png\n", file=f)
 
 sys.stdout = original_stdout

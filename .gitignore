@@ -1,5 +1,5 @@
 # Ignore the following files
 globalterrorismdb.csv
-my_plot.png
-output.txt
+histograms.png
+exploratory_output.txt
 __pycache__
